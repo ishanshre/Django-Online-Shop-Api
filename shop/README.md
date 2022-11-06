@@ -10,9 +10,17 @@
 7. OrderItem
 
 ### Product Attributes
-1. Title 
-2. Description
-3. Price
-4. Inventory
-5. Created at
-6. Last Updated
+1. title 
+2. Slug
+3. description
+4. price
+5. inventory
+6. created_at
+7. last_updated
+
+### Customer Attributes
+1. first_name
+2. last_name
+3. email --> (unique field)
+4. phone
+5. birth_date (can be null)
