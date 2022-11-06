@@ -1,6 +1,8 @@
 from django.db import models
 from django.core.validators import MinValueValidator
 # Create your models here.
+
+# Product Database Model
 class Product(models.Model):
     title = models.CharField(max_length=100)
     slug = models.SlugField()
@@ -16,6 +18,8 @@ class Product(models.Model):
     class Meta:
         ordering = ['title']
 
+
+# Customer Database Model
 class Customer(models.Model):
     class MEMBERSHIPS_CHOICES(models.TextChoices):
         MEMBERSHIP_BRONZE = 'B', 'Bronze'
@@ -36,3 +40,20 @@ class Customer(models.Model):
     
     class Meta:
         ordering = ['first_name','last_name']
+
+
+
+# Order Database Model
+class Order(models.Model):
+    class PAYMENT_STATUS(models.TextChoices):
+        PENDING = 'P', 'Pending'
+        COMPLETE = 'P', 'Complete'
+        FAILED = 'P', 'Failed'
+        CANCELED = 'P', 'Canceled'
+    placed_at = models.DateTimeField(auto_now_add=True)
+    payment_status = models.CharField(max_length=10, choices=PAYMENT_STATUS.choices, default=PAYMENT_STATUS.PENDING)
+    customer = models.ForeignKey(Customer, on_delete=models.PROTECT)
+
+    def __str__(self):
+        return f"{self.customer.first_name} {self.customer.last_name} --> order status --> {self.payment_status}"
+    

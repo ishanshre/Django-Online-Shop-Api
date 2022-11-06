@@ -25,3 +25,8 @@
 4. phone
 5. birth_date (can be null)
 6. membership --> (enum choices)
+
+### Order Attributes
+1. placed_at
+2. payment_status --> (enum choices)
+3. customer --> (Order entity is many to one relationship with customer. i.e. customer has many orders)
