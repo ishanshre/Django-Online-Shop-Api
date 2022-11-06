@@ -24,3 +24,4 @@
 3. email --> (unique field)
 4. phone
 5. birth_date (can be null)
+6. membership --> (enum choices)
