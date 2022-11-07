@@ -40,10 +40,13 @@ INSTALLED_APPS = [
 
     #third party apps
     'debug_toolbar',
+    'rest_framework',
 
     #local apps
     'accounts.apps.AccountsConfig',
     'shop.apps.ShopConfig',
+    'tags.apps.TagsConfig',
+    'likes.apps.LikesConfig',
 ]
 
 MIDDLEWARE = [
@@ -140,3 +143,8 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = 'accounts.User'
+
+
+REST_FRAMEWORK = {
+    'COERCE_DECIMAL_TO_STRING':False,
+}
