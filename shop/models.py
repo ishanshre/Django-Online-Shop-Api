@@ -7,8 +7,8 @@ class Product(models.Model):
     title = models.CharField(max_length=100)
     slug = models.SlugField()
     description = models.TextField(null=True, blank=True)
-    price = models.DecimalField(max_digits=6, decimal_places=2, validators=MinValueValidator(1))
-    inventory = models.IntegerField(validators=MinValueValidator(0))
+    price = models.DecimalField(max_digits=6, decimal_places=2, validators=[MinValueValidator(1)])
+    inventory = models.IntegerField(validators=[MinValueValidator(0)])
     created_at = models.DateTimeField(auto_now_add=True)
     last_update = models.DateTimeField(auto_now=True)
 
@@ -47,9 +47,9 @@ class Customer(models.Model):
 class Order(models.Model):
     class PAYMENT_STATUS(models.TextChoices):
         PENDING = 'P', 'Pending'
-        COMPLETE = 'P', 'Complete'
-        FAILED = 'P', 'Failed'
-        CANCELED = 'P', 'Canceled'
+        COMPLETE = 'C', 'Complete'
+        FAILED = 'F', 'Failed'
+        CANCELED = 'CA', 'Canceled'
     placed_at = models.DateTimeField(auto_now_add=True)
     payment_status = models.CharField(max_length=10, choices=PAYMENT_STATUS.choices, default=PAYMENT_STATUS.PENDING)
     customer = models.ForeignKey(Customer, on_delete=models.PROTECT)
