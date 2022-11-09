@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Product
+from .models import Product, Collection
 from decimal import Decimal
 from django.utils.timesince import timesince
 
@@ -15,12 +15,44 @@ from django.utils.timesince import timesince
 #     def calculate_tax(self, product: Product):
 #         return product.unit_price * Decimal(1.1)
 
+
+
+class CollectionSerializer(serializers.ModelSerializer):
+    products_count = serializers.IntegerField(read_only=True)
+    class Meta:
+        model = Collection
+        fields = ['id','title','products_count']
+
+
+
 class ProductSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True)
     price = serializers.DecimalField(max_digits=6, decimal_places=2, source='unit_price')
     price_with_tax = serializers.SerializerMethodField(method_name='calculate_tax')
+    '''
+    Serializing a collection models ID 
+    collection = serializers.PrimaryKeyRelatedField(
+        queryset = Collection.objects.all()
+    )
+    '''
+    '''
+    Serializing a collection models object into string
+    collection = serializers.StringRelatedField()
+    '''
+    '''
+    Serializing a collection model object 
+    collection = CollectionSerializer()
+    '''
+    '''
+    serializers.HyperLinkRelatedField ---> used to represent the target of the relationship using hyperlink
+    collection = serializers.HyperlinkedRelatedField(read_only=True, view_name='shop:collection-detail')
+    '''
+    collection = serializers.HyperlinkedRelatedField(read_only=True, view_name='shop:collection-detail')
+
+
     created_at = serializers.SerializerMethodField(method_name='create_timesince')
     last_update = serializers.SerializerMethodField(method_name='update_timesince')
+    
     def calculate_tax(self, product: Product):
         return product.unit_price * Decimal(1.1)
     
@@ -32,4 +64,4 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['id','title','price','price_with_tax', 'created_at','last_update']
+        fields = ['id','title','price','price_with_tax', 'collection', 'created_at','last_update']

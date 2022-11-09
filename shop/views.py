@@ -1,6 +1,6 @@
 from django.shortcuts import render
-from .serializers import ProductSerializer
-from .models import Product
+from .serializers import ProductSerializer, CollectionSerializer
+from .models import Product, Collection
 # from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
@@ -8,6 +8,8 @@ from rest_framework import status
 from django.http import Http404
 # from rest_framework.views import APIView
 from rest_framework import generics
+from rest_framework import viewsets
+from django.db.models import Count
 # from rest_framework import mixins
 # Create your views here.
 
@@ -122,7 +124,8 @@ from rest_framework import generics
 #     def delete(self, request, format=None, *args, **kwargs):
 #         return self.destroy(request, *args, **kwargs)
 
-
+'''
+Class based Views
 class ProductList(generics.ListCreateAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
@@ -131,3 +134,52 @@ class ProductList(generics.ListCreateAPIView):
 class ProductDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+
+    def delete(self, request, *args, **kwargs):
+        obj = self.get_object()
+        if obj.product_orderitems.count() > 0:
+            return Response({
+                'error':'Product cannot be deleted because it is associated with order items',
+            }, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        return super().delete(request, *args, **kwargs)
+
+'''
+
+class ProductViewSet(viewsets.ModelViewSet):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+
+    def destroy(self, request, *args, **kwargs):
+        obj = self.get_object()
+        if obj.product_orderitems.count() > 0:
+            return Response({
+                'error':'Product cannot be deleted when more than one product is associated with order items.'
+            }, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        return super().destroy(request, *args, **kwargs)
+
+'''
+class CollectionList(generics.ListCreateAPIView):
+    queryset = Collection.objects.annotate(products_count=Count('collection_products')).all()
+    serializer_class = CollectionSerializer
+
+class CollectionDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Collection.objects.annotate(products_count=Count('collection_products')).all()
+    serializer_class = CollectionSerializer
+
+    def destroy(self, request, *args, **kwargs):
+        if self.get_object().collection_products.count() > 0:
+            return Response({'error':'collection cannot be deleted when 1 or more products'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        return super().destroy(request, *args, **kwargs)
+'''
+
+class CollectionViewSet(viewsets.ModelViewSet):
+    queryset = Collection.objects.annotate(products_count=Count('collection_products')).all()
+    serializer_class = CollectionSerializer
+
+    def destroy(self, request, *args, **kwargs):
+        obj = self.get_object()
+        if obj.collection_products.count() > 0:
+            return Response({
+                'error': 'Collection cannot be deleted when it has one or more products'
+            }, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        return super().destroy(request, *args, **kwargs)
