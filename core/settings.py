@@ -146,5 +146,5 @@ AUTH_USER_MODEL = 'accounts.User'
 
 
 REST_FRAMEWORK = {
-    'COERCE_DECIMAL_TO_STRING':False,
+    'COERCE_DECIMAL_TO_STRING':False, #False ---> speicifes not convert decimals to string in json
 }
