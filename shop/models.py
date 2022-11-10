@@ -113,7 +113,7 @@ class CartItem(models.Model):
 
 
 class Review(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product_reviews')
     rating = models.FloatField(validators=[MinValueValidator(1),MaxValueValidator(5)], blank=True, null=True)
     name = models.CharField(max_length=255)
     description = models.TextField()

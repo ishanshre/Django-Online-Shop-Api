@@ -70,4 +70,10 @@ class ProductSerializer(serializers.ModelSerializer):
 class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
-        fields = ['id', 'rating','name','description','product']
+        fields = ['id', 'rating','name','description']
+
+
+    #overide create method to add product id of page where we write the review
+    def create(self, validated_data):
+        product_id = self.context['product_id']
+        return Review.objects.create(product_id=product_id, **validated_data)

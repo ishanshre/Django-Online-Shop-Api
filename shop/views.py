@@ -1,6 +1,6 @@
 from django.shortcuts import render
-from .serializers import ProductSerializer, CollectionSerializer
-from .models import Product, Collection
+from .serializers import ProductSerializer, CollectionSerializer, ReviewSerializer
+from .models import Product, Collection, Review
 # from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
@@ -183,3 +183,15 @@ class CollectionViewSet(viewsets.ModelViewSet):
                 'error': 'Collection cannot be deleted when it has one or more products'
             }, status=status.HTTP_405_METHOD_NOT_ALLOWED)
         return super().destroy(request, *args, **kwargs)
+
+
+
+class ReviewViewSet(viewsets.ModelViewSet):
+    serializer_class = ReviewSerializer
+    
+    def get_queryset(self):
+        return Review.objects.filter(product_id=self.kwargs['product_pk'])
+    
+
+    def get_serializer_context(self):
+        return {'product_id': self.kwargs['product_pk']}# return the prodcut id where we write the review

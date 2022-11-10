@@ -2,16 +2,20 @@ from django.urls import path
 from . import views
 from rest_framework.urlpatterns import format_suffix_patterns
 #from rest_framework.routers import SimpleRouter
-from rest_framework.routers import DefaultRouter # get additional features compared to simple router
+#from rest_framework.routers import DefaultRouter # get additional features compared to simple router
+from rest_framework_nested import routers
 from pprint import pprint
 app_name = 'shop'
 #router = SimpleRouter()
-router = DefaultRouter()
+#router = DefaultRouter()
+router = routers.DefaultRouter()
 router.register('products', views.ProductViewSet)
 router.register('collections', views.CollectionViewSet)
+products_router = routers.NestedDefaultRouter(router, 'products', lookup='product')
+products_router.register('reviews', views.ReviewViewSet, basename='product-reviews')
 pprint(router.urls)
 
-urlpatterns = router.urls
+urlpatterns = router.urls + products_router.urls
 
 # urlpatterns = [
 #     #path('product/', views.ProductList.as_view()),
