@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     #third party apps
     'debug_toolbar',
     'rest_framework',
+    'django_filters',
 
     #local apps
     'accounts.apps.AccountsConfig',

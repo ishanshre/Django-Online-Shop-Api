@@ -10,6 +10,8 @@ from django.http import Http404
 from rest_framework import generics
 from rest_framework import viewsets
 from django.db.models import Count
+from django_filters.rest_framework import DjangoFilterBackend # for generic filters
+from .filters import ProductFilter # importing custom generic filter
 # from rest_framework import mixins
 # Create your views here.
 
@@ -147,16 +149,22 @@ class ProductDetail(generics.RetrieveUpdateDestroyAPIView):
 
 class ProductViewSet(viewsets.ModelViewSet):
     # queryset = Product.objects.all()
+    queryset = Product.objects.all()
     serializer_class = ProductSerializer
+    # specifying a django filter backend 
+    filter_backends = [DjangoFilterBackend]
+    # creating a list named filterset_fields of fileds for filtering
+    #filterset_fields = ['collection_id']
+    filterset_class = ProductFilter
 
-    def get_queryset(self):
-        queryset = Product.objects.all()#return all product
-        collection_id = self.request.query_params.get('collection_id')# get the collection_id if given in the query parameters. 
-        # query_params is a dict that stores parameters in given url
-        # check collection is None. If Not none return product that has collection_id else return all product
-        if collection_id is not None:
-            return queryset.filter(collection_id=collection_id)
-        return queryset
+    # def get_queryset(self):
+    #     queryset = Product.objects.all()#return all product
+    #     collection_id = self.request.query_params.get('collection_id')# get the collection_id if given in the query parameters. 
+    #     # query_params is a dict that stores parameters in given url
+    #     # check collection is None. If Not none return product that has collection_id else return all product
+    #     if collection_id is not None:
+    #         return queryset.filter(collection_id=collection_id)
+    #     return queryset
 
     def destroy(self, request, *args, **kwargs):
         obj = self.get_object()
