@@ -12,6 +12,7 @@ from rest_framework import viewsets
 from django.db.models import Count
 from django_filters.rest_framework import DjangoFilterBackend # for generic filters
 from .filters import ProductFilter # importing custom generic filter
+from rest_framework.filters import SearchFilter
 # from rest_framework import mixins
 # Create your views here.
 
@@ -152,10 +153,11 @@ class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     # specifying a django filter backend 
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend, SearchFilter]
     # creating a list named filterset_fields of fileds for filtering
     #filterset_fields = ['collection_id']
     filterset_class = ProductFilter
+    search_fields = ['title','description']
 
     # def get_queryset(self):
     #     queryset = Product.objects.all()#return all product
