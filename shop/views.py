@@ -13,6 +13,8 @@ from django.db.models import Count
 from django_filters.rest_framework import DjangoFilterBackend # for generic filters
 from .filters import ProductFilter # importing custom generic filter
 from rest_framework.filters import SearchFilter, OrderingFilter
+#from rest_framework.pagination import PageNumberPagination
+from .pagination import CustomDefaultPagination
 # from rest_framework import mixins
 # Create your views here.
 
@@ -159,6 +161,9 @@ class ProductViewSet(viewsets.ModelViewSet):
     filterset_class = ProductFilter
     search_fields = ['title','description']
     ordering_fields = ['unit_price','last_update']
+    #pagination_class = PageNumberPagination # specification pagination class and add no. of items in setting.py
+    pagination_class = CustomDefaultPagination
+
 
     # def get_queryset(self):
     #     queryset = Product.objects.all()#return all product
