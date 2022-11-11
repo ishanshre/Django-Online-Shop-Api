@@ -9,14 +9,14 @@ app_name = 'shop'
 #router = SimpleRouter()
 #router = DefaultRouter()
 router = routers.DefaultRouter()
-router.register('products', views.ProductViewSet)
+router.register('products', views.ProductViewSet, basename='products')
 router.register('collections', views.CollectionViewSet)
 products_router = routers.NestedDefaultRouter(router, 'products', lookup='product')
 products_router.register('reviews', views.ReviewViewSet, basename='product-reviews')
-pprint(router.urls)
+
 
 urlpatterns = router.urls + products_router.urls
-
+pprint(urlpatterns)
 # urlpatterns = [
 #     #path('product/', views.ProductList.as_view()),
 #     #path('product/<int:pk>/', views.ProductDetail.as_view()),

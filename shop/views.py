@@ -146,8 +146,17 @@ class ProductDetail(generics.RetrieveUpdateDestroyAPIView):
 '''
 
 class ProductViewSet(viewsets.ModelViewSet):
-    queryset = Product.objects.all()
+    # queryset = Product.objects.all()
     serializer_class = ProductSerializer
+
+    def get_queryset(self):
+        queryset = Product.objects.all()#return all product
+        collection_id = self.request.query_params.get('collection_id')# get the collection_id if given in the query parameters. 
+        # query_params is a dict that stores parameters in given url
+        # check collection is None. If Not none return product that has collection_id else return all product
+        if collection_id is not None:
+            return queryset.filter(collection_id=collection_id)
+        return queryset
 
     def destroy(self, request, *args, **kwargs):
         obj = self.get_object()
