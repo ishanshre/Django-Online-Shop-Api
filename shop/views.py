@@ -1,6 +1,6 @@
 from django.shortcuts import render
-from .serializers import ProductSerializer, CollectionSerializer, ReviewSerializer
-from .models import Product, Collection, Review
+from .serializers import ProductSerializer, CollectionSerializer, ReviewSerializer, CartSerializer
+from .models import Product, Collection, Review, Cart
 # from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
@@ -9,6 +9,7 @@ from django.http import Http404
 # from rest_framework.views import APIView
 from rest_framework import generics
 from rest_framework import viewsets
+from rest_framework import mixins
 from django.db.models import Count
 from django_filters.rest_framework import DjangoFilterBackend # for generic filters
 from .filters import ProductFilter # importing custom generic filter
@@ -220,3 +221,8 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
     def get_serializer_context(self):
         return {'product_id': self.kwargs['product_pk']}# return the prodcut id where we write the review
+
+
+class CartViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
+    queryset = Cart.objects.all()
+    serializer_class = CartSerializer
