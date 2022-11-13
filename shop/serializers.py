@@ -3,6 +3,7 @@ from .models import Product, Collection, Review, Cart, CartItem
 from decimal import Decimal
 from django.utils.timesince import timesince
 
+
 # class ProductSerializer(serializers.Serializer):
 #     id = serializers.IntegerField(read_only=True)
 #     title = serializers.CharField(max_length=255)
@@ -79,8 +80,25 @@ class ReviewSerializer(serializers.ModelSerializer):
         return Review.objects.create(product_id=product_id, **validated_data)
 
 
+class SimpleProductSerializer(ProductSerializer):
+    class Meta:
+        model = Product
+        fields = ['id','title','price', 'price_with_tax']
+
+
+class CartItemsSerializer(serializers.ModelSerializer):
+    product = SimpleProductSerializer()
+    class Meta:
+        model = CartItem
+        fields = ['product', 'quantity']
 class CartSerializer(serializers.ModelSerializer):
     id = serializers.UUIDField(read_only=True)
+    items = CartItemsSerializer(many=True, source='cart_items')
+    total_price = serializers.SerializerMethodField(method_name='get_total_price')
+
+
+    def get_total_price(self, cart:Cart):
+        return sum([item.quantity * item.product.unit_price for item in cart.cart_items.all()])
     class Meta:
         model = Cart
-        fields = ['id']
+        fields = ['id','items','total_price']

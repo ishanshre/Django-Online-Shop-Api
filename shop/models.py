@@ -103,14 +103,14 @@ class Address(models.Model):
 
 # cart model
 class Cart(models.Model):
-    id = models.UUIDField(primary_key=True,default=uuid.uuid4, unique=True)
+    id = models.UUIDField(primary_key=True,default=uuid.uuid4, editable=False, max_length=36)
     created_at = models.DateTimeField(auto_now_add=True)
 
 
 # cart items model
 class CartItem(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='cart_items')
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='cartitems_product')
     quantity = models.PositiveIntegerField()
 
     class Meta:

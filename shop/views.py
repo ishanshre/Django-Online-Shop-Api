@@ -223,6 +223,6 @@ class ReviewViewSet(viewsets.ModelViewSet):
         return {'product_id': self.kwargs['product_pk']}# return the prodcut id where we write the review
 
 
-class CartViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
-    queryset = Cart.objects.all()
+class CartViewSet(mixins.CreateModelMixin,mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
+    queryset = Cart.objects.prefetch_related('cart_items__product').all()
     serializer_class = CartSerializer
