@@ -1,6 +1,6 @@
 from django.shortcuts import render
-from .serializers import ProductSerializer, CollectionSerializer, ReviewSerializer, CartSerializer
-from .models import Product, Collection, Review, Cart
+from .serializers import ProductSerializer, CollectionSerializer, ReviewSerializer, CartSerializer, CartItemsSerializer
+from .models import Product, Collection, Review, Cart, CartItem
 # from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
@@ -230,3 +230,14 @@ class CartViewSet(mixins.CreateModelMixin,
                 viewsets.GenericViewSet):
     queryset = Cart.objects.prefetch_related('cart_items__product').all()
     serializer_class = CartSerializer
+
+
+
+class CartItemsViewSet(viewsets.ModelViewSet):
+    serializer_class = CartItemsSerializer
+    def get_serializer_context(self):
+        return {'cart_id': self.kwargs['cart_pk']}
+    def get_queryset(self):
+        return CartItem.objects.filter(cart_id=self.kwargs['cart_pk']).select_related('product')
+
+ 

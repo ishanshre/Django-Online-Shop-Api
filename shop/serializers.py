@@ -90,7 +90,7 @@ class CartItemsSerializer(serializers.ModelSerializer):
     product = SimpleProductSerializer()
     class Meta:
         model = CartItem
-        fields = ['product', 'quantity']
+        fields = ['id','product', 'quantity']
 class CartSerializer(serializers.ModelSerializer):
     id = serializers.UUIDField(read_only=True)
     items = CartItemsSerializer(many=True, source='cart_items', read_only=True)
