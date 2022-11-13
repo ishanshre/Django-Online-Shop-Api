@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
+import uuid
 # Create your models here.
 
 
@@ -102,6 +103,7 @@ class Address(models.Model):
 
 # cart model
 class Cart(models.Model):
+    id = models.UUIDField(primary_key=True,default=uuid.uuid4, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
 
