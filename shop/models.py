@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.conf import settings
 import uuid
 # Create your models here.
 
@@ -53,9 +54,7 @@ class Customer(models.Model):
         OTHERS = "O", "Others"
 
 
-    first_name = models.CharField(max_length=100)
-    last_name = models.CharField(max_length=100)
-    email = models.EmailField(max_length=255, unique=True)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     phone = models.CharField(max_length=10)
     birth_date = models.DateTimeField(null=True)
     gender = models.CharField(max_length=10, choices=GENDER.choices, blank=True)
@@ -65,7 +64,7 @@ class Customer(models.Model):
         return f"{self.first_name} {self.last_name}"
     
     class Meta:
-        ordering = ['first_name','last_name']
+        ordering = ['gender','membership']
 
 
 
@@ -83,6 +82,7 @@ class Order(models.Model):
     def __str__(self):
         return f"{self.customer.first_name} {self.customer.last_name} --> order status --> {self.payment_status}"
 
+    
 
 # Order Items
 class OrderItem(models.Model):
