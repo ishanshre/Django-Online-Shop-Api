@@ -1,6 +1,19 @@
 from django.shortcuts import render
-from .serializers import ProductSerializer, CollectionSerializer, ReviewSerializer, CartSerializer, CartItemsSerializer
-from .models import Product, Collection, Review, Cart, CartItem
+from .serializers import (
+    ProductSerializer, 
+    CollectionSerializer, 
+    ReviewSerializer, 
+    CartSerializer, 
+    CartItemsSerializer,
+    AddCartItemSerializer,
+)
+from .models import (
+    Product, 
+    Collection, 
+    Review, 
+    Cart, 
+    CartItem,
+)
 # from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
@@ -228,16 +241,25 @@ class CartViewSet(mixins.CreateModelMixin,
                 mixins.RetrieveModelMixin, 
                 mixins.DestroyModelMixin,
                 viewsets.GenericViewSet):
+    # using prefetch_related to get all the cartitem with associated products
     queryset = Cart.objects.prefetch_related('cart_items__product').all()
     serializer_class = CartSerializer
 
 
 
 class CartItemsViewSet(viewsets.ModelViewSet):
-    serializer_class = CartItemsSerializer
+
+
+    def get_serializer_class(self):
+        if self.request.method == "POST":
+            return AddCartItemSerializer
+        return CartItemsSerializer
+
+
     def get_serializer_context(self):
-        return {'cart_id': self.kwargs['cart_pk']}
+        return {'cart_id': self.kwargs['cart_pk']} # get the cart pk 
     def get_queryset(self):
+        # return a cartitem related to cart and optimize product query in cartitem using select related
         return CartItem.objects.filter(cart_id=self.kwargs['cart_pk']).select_related('product')
 
  
