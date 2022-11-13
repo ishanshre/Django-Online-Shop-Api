@@ -6,6 +6,7 @@ from .serializers import (
     CartSerializer, 
     CartItemsSerializer,
     AddCartItemSerializer,
+    UpdateCartItemSerializer,
 )
 from .models import (
     Product, 
@@ -248,11 +249,14 @@ class CartViewSet(mixins.CreateModelMixin,
 
 
 class CartItemsViewSet(viewsets.ModelViewSet):
-
+    # http_method_name are the method that client have access to 
+    http_method_names = ['get','post','patch','delete']
 
     def get_serializer_class(self):
         if self.request.method == "POST":
             return AddCartItemSerializer
+        if self.request.method == "PATCH":
+            return UpdateCartItemSerializer
         return CartItemsSerializer
 
 
