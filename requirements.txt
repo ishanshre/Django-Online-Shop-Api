@@ -21,3 +21,5 @@ python-dotenv==0.21.0
 pytz==2022.6
 sqlparse==0.4.3
 drf-nested-routers==0.93.4
+djoser==2.1.0
+djangorestframework-simplejwt==4.8.0

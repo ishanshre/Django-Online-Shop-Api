@@ -82,7 +82,10 @@ class Order(models.Model):
     def __str__(self):
         return f"{self.customer.first_name} {self.customer.last_name} --> order status --> {self.payment_status}"
 
-    
+    class Meta:
+        permissions  = [
+            ('cancel_order', 'Can cancel order'),
+        ]
 
 # Order Items
 class OrderItem(models.Model):
