@@ -7,6 +7,7 @@ from .serializers import (
     CartItemsSerializer,
     AddCartItemSerializer,
     UpdateCartItemSerializer,
+    CustomerSerializer
 )
 from .models import (
     Product, 
@@ -14,6 +15,7 @@ from .models import (
     Review, 
     Cart, 
     CartItem,
+    Customer
 )
 # from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -267,3 +269,7 @@ class CartItemsViewSet(viewsets.ModelViewSet):
         return CartItem.objects.filter(cart_id=self.kwargs['cart_pk']).select_related('product')
 
  
+
+class CustomerViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.UpdateModelMixin,viewsets.GenericViewSet):
+    queryset = Customer.objects.all()
+    serializer_class = CustomerSerializer
