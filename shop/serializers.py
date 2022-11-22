@@ -28,7 +28,7 @@ class CollectionSerializer(serializers.ModelSerializer):
 
 class ProductSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True)
-    price = serializers.DecimalField(max_digits=6, decimal_places=2, source='unit_price')
+    price = serializers.DecimalField(max_digits=10, decimal_places=2, source='unit_price')
     price_with_tax = serializers.SerializerMethodField(method_name='calculate_tax')
     '''
     Serializing a collection models ID 
