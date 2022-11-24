@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from .serializers import (
     ProductSerializer, 
     CollectionSerializer, 
@@ -21,6 +21,7 @@ from .models import (
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated, AllowAny
 # from rest_framework.parsers import JSONParser
 from django.http import Http404
 # from rest_framework.views import APIView
@@ -182,7 +183,7 @@ class ProductViewSet(viewsets.ModelViewSet):
     #pagination_class = PageNumberPagination # specification pagination class and add no. of items in setting.py
     pagination_class = CustomDefaultPagination
 
-
+    
     # def get_queryset(self):
     #     queryset = Product.objects.all()#return all product
     #     collection_id = self.request.query_params.get('collection_id')# get the collection_id if given in the query parameters. 
@@ -274,10 +275,16 @@ class CartItemsViewSet(viewsets.ModelViewSet):
 class CustomerViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.UpdateModelMixin,viewsets.GenericViewSet):
     queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_permissions(self):
+        if self.request.method == "GET":
+            return [AllowAny()]
+        return [IsAuthenticated()]
 
     @action(detail=False, methods=['GET','PUT'])
     def me(self, request):
-        (customer, created) = Customer.objects.get_or_create(id=request.user.id)
+        customer = get_object_or_404(Customer, id=request.user.id)
         if request.method == 'GET':
             serializer = CustomerSerializer(customer)
             return Response(serializer.data)
