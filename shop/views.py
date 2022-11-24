@@ -20,6 +20,7 @@ from .models import (
 # from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.decorators import action
 # from rest_framework.parsers import JSONParser
 from django.http import Http404
 # from rest_framework.views import APIView
@@ -273,3 +274,15 @@ class CartItemsViewSet(viewsets.ModelViewSet):
 class CustomerViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.UpdateModelMixin,viewsets.GenericViewSet):
     queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
+
+    @action(detail=False, methods=['GET','PUT'])
+    def me(self, request):
+        (customer, created) = Customer.objects.get_or_create(id=request.user.id)
+        if request.method == 'GET':
+            serializer = CustomerSerializer(customer)
+            return Response(serializer.data)
+        elif request.method == 'PUT':
+            serializer = CustomerSerializer(customer, data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
