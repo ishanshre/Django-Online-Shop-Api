@@ -21,7 +21,7 @@ from .models import (
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 # from rest_framework.parsers import JSONParser
 from django.http import Http404
 # from rest_framework.views import APIView
@@ -35,6 +35,8 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 #from rest_framework.pagination import PageNumberPagination
 from .pagination import CustomDefaultPagination
 # from rest_framework import mixins
+
+from shop.permissions import IsAdminOrReadOnly
 # Create your views here.
 
 
@@ -182,6 +184,7 @@ class ProductViewSet(viewsets.ModelViewSet):
     ordering_fields = ['unit_price','last_update']
     #pagination_class = PageNumberPagination # specification pagination class and add no. of items in setting.py
     pagination_class = CustomDefaultPagination
+    permission_classes = [IsAdminOrReadOnly]
 
     
     # def get_queryset(self):
@@ -272,17 +275,12 @@ class CartItemsViewSet(viewsets.ModelViewSet):
 
  
 
-class CustomerViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.UpdateModelMixin,viewsets.GenericViewSet):
+class CustomerViewSet(viewsets.ModelViewSet):
     queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdminUser]
 
-    def get_permissions(self):
-        if self.request.method == "GET":
-            return [AllowAny()]
-        return [IsAuthenticated()]
-
-    @action(detail=False, methods=['GET','PUT'])
+    @action(detail=False, methods=['GET','PUT'], permission_classes=[IsAuthenticated])
     def me(self, request):
         customer = get_object_or_404(Customer, id=request.user.id)
         if request.method == 'GET':
