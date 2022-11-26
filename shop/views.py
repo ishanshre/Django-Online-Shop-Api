@@ -299,9 +299,22 @@ class CustomerViewSet(viewsets.ModelViewSet):
 class OrderViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
-    # it passes the data to the validated data in serializer
-    def get_serializer_context(self):
-        return {"user_id": self.request.user.id}
+
+    def create(self, request, *args, **kwargs):
+        serializer = CreateOrderSerializer(
+            data = request.data,
+            context = {"user_id":request.user.id}
+        )
+        serializer.is_valid(raise_exception=True)
+        order = serializer.save()
+        seralizer = OrderSerializer(order)
+        return Response(serializer.data)
+        
+
+    # This method is only used for default create method.
+    # # it passes the data to the validated data in serializer
+    # def get_serializer_context(self):
+    #     return {"user_id": self.request.user.id}
 
     def get_serializer_class(self):
         if self.request.method == "POST":

@@ -111,7 +111,7 @@ class AddCartItemSerializer(serializers.ModelSerializer):
 
     # validating product_id field
     def validate_product_id(self, value):
-        if not Product.objects.get(pk=value).exists():
+        if not Product.objects.filter(pk=value).exists():
             raise serializers.ValidationError('Product with given id does not exist')
         return value
 
@@ -174,6 +174,14 @@ Then create a Order object using customer object and cart id
 class CreateOrderSerializer(serializers.Serializer):
     cart_id = serializers.UUIDField()
 
+    def validate_cart_id(self, cart_id):
+        if not Cart.objects.filter(pk=cart_id).exists():
+            raise serializers.ValidationError("The cart does not exists")
+        if CartItem.objects.filter(cart_id=cart_id).count() == 0:
+            raise serializers.ValidationError("The cart is empty")
+        return cart_id
+
+
     def save(self, **kwargs):
         '''
         1. We use transaction.atomic() because there are many database changes. And we want either to update all database changes successfully or if there goes something wrong then roll back the changes
@@ -187,8 +195,6 @@ class CreateOrderSerializer(serializers.Serializer):
         '''
         with transaction.atomic():
             cart_id = self.validated_data["cart_id"]
-            print(self.context['user_id'])
-
             (customer, created) = Customer.objects.get_or_create(user__id = self.context['user_id'])
             order = Order.objects.create(customer = customer)
 
@@ -205,3 +211,4 @@ class CreateOrderSerializer(serializers.Serializer):
             ]
             OrderItem.objects.bulk_create(order_items)
             Cart.objects.get(pk=cart_id).delete()
+            return order
