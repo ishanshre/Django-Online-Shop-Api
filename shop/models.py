@@ -61,7 +61,7 @@ class Customer(models.Model):
     membership = models.CharField(max_length=20, choices=MEMBERSHIPS_CHOICES.choices, default=MEMBERSHIPS_CHOICES.MEMBERSHIP_BRONZE)
 
     def __str__(self):
-        return f"{self.first_name} {self.last_name}"
+        return f"{self.user.first_name} {self.user.last_name}"
     
     class Meta:
         ordering = ['gender','membership']
@@ -80,7 +80,7 @@ class Order(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.PROTECT)
 
     def __str__(self):
-        return f"{self.customer.first_name} {self.customer.last_name} --> order status --> {self.payment_status}"
+        return f"{self.customer.user.first_name} {self.customer.user.last_name} --> order status --> {self.payment_status}"
 
     class Meta:
         permissions  = [
@@ -89,10 +89,14 @@ class Order(models.Model):
 
 # Order Items
 class OrderItem(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.PROTECT)
+    order = models.ForeignKey(Order, on_delete=models.PROTECT, related_name="order_items")
     product = models.ForeignKey(Product, on_delete=models.PROTECT, related_name='product_orderitems')
     quantity = models.PositiveIntegerField()
-    unit_price = models.DecimalField(max_digits=6, decimal_places=2, validators=[MinValueValidator(0)])
+    unit_price = models.DecimalField(max_digits=15, decimal_places=2, validators=[MinValueValidator(0)], blank=True)
+
+    def save(self):
+        self.unit_price = self.product.unit_price * self.quantity
+        return super().save()
 
 
 # Address Model

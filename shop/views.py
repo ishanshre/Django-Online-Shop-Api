@@ -7,7 +7,8 @@ from .serializers import (
     CartItemsSerializer,
     AddCartItemSerializer,
     UpdateCartItemSerializer,
-    CustomerSerializer
+    CustomerSerializer,
+    OrderSerializer,
 )
 from .models import (
     Product, 
@@ -15,13 +16,14 @@ from .models import (
     Review, 
     Cart, 
     CartItem,
-    Customer
+    Customer,
+    Order
 )
 # from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
+from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser, DjangoModelPermissions, DjangoModelPermissionsOrAnonReadOnly
 # from rest_framework.parsers import JSONParser
 from django.http import Http404
 # from rest_framework.views import APIView
@@ -36,7 +38,7 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 from .pagination import CustomDefaultPagination
 # from rest_framework import mixins
 
-from shop.permissions import IsAdminOrReadOnly
+from shop.permissions import IsAdminOrReadOnly, FullDjangoModelPermission
 # Create your views here.
 
 
@@ -278,7 +280,8 @@ class CartItemsViewSet(viewsets.ModelViewSet):
 class CustomerViewSet(viewsets.ModelViewSet):
     queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
-    permission_classes = [IsAdminUser]
+    #permission_classes = [IsAdminUser]
+    permission_classes = [IsAdminOrReadOnly]
 
     @action(detail=False, methods=['GET','PUT'], permission_classes=[IsAuthenticated])
     def me(self, request):
@@ -291,3 +294,8 @@ class CustomerViewSet(viewsets.ModelViewSet):
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data)
+
+class OrderViewSet(viewsets.ModelViewSet):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+    
