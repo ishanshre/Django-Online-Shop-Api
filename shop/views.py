@@ -38,6 +38,7 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 #from rest_framework.pagination import PageNumberPagination
 from .pagination import CustomDefaultPagination
 # from rest_framework import mixins
+from typing import List
 
 from shop.permissions import IsAdminOrReadOnly, FullDjangoModelPermission
 # Create your views here.
@@ -297,7 +298,12 @@ class CustomerViewSet(viewsets.ModelViewSet):
                 return Response(serializer.data)
 
 class OrderViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated]
+    http_method_names: List[str] = ['get', 'post', 'patch','delete','head','options']
+
+    def get_permissions(self):
+        if self.request.method in ['PATCH','DELETE']:
+            return [IsAdminUser()]
+        return [IsAuthenticated()]
 
 
     def create(self, request, *args, **kwargs):
