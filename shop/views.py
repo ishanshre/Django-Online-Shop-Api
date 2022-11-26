@@ -9,6 +9,7 @@ from .serializers import (
     UpdateCartItemSerializer,
     CustomerSerializer,
     OrderSerializer,
+    CreateOrderSerializer,
 )
 from .models import (
     Product, 
@@ -296,6 +297,20 @@ class CustomerViewSet(viewsets.ModelViewSet):
                 return Response(serializer.data)
 
 class OrderViewSet(viewsets.ModelViewSet):
-    queryset = Order.objects.all()
-    serializer_class = OrderSerializer
-    
+    permission_classes = [IsAuthenticated]
+
+    # it passes the data to the validated data in serializer
+    def get_serializer_context(self):
+        return {"user_id": self.request.user.id}
+
+    def get_serializer_class(self):
+        if self.request.method == "POST":
+            return CreateOrderSerializer
+        return OrderSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_superuser:
+            return Order.objects.all()
+        (customer_id, created) = Customer.objects.only("id").get_or_create(user__id=user.id)
+        return Order.objects.filter(customer_id=customer_id)
