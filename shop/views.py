@@ -334,5 +334,5 @@ class OrderViewSet(viewsets.ModelViewSet):
         user = self.request.user
         if user.is_superuser:
             return Order.objects.all()
-        (customer_id, created) = Customer.objects.only("id").get_or_create(user__id=user.id)
+        customer_id = Customer.objects.only("id").get(user__id=user.id)
         return Order.objects.filter(customer_id=customer_id)
