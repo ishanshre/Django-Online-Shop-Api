@@ -54,7 +54,7 @@ class Customer(models.Model):
         OTHERS = "O", "Others"
 
 
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="customer_profile")
     phone = models.CharField(max_length=10)
     birth_date = models.DateTimeField(null=True)
     gender = models.CharField(max_length=10, choices=GENDER.choices, blank=True)
