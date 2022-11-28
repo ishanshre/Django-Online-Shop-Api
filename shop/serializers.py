@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Product, Collection, Review, Cart, CartItem, Customer, Order, OrderItem
+from .models import Product, Collection, Review, Cart, CartItem, Customer, Order, OrderItem, ProductImage
 from decimal import Decimal
 from django.utils.timesince import timesince
 from django.db import transaction
@@ -27,10 +27,36 @@ class CollectionSerializer(serializers.ModelSerializer):
 
 
 
+class ProductImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductImage
+        fields = ["id","image"]
+
+    # when end user uploads image, we did not provide them the product id fields
+    # so we need to define product id that we get from the modelviewset
+    def create(self, validated_data):
+        product_id = self.context['product_id']
+        return ProductImage.objects.create(product_id = product_id, **validated_data)
+
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = ['id', 'rating','name','description']
+
+
+    #overide create method to add product id of page where we write the review
+    def create(self, validated_data):
+        product_id = self.context['product_id']
+        return Review.objects.create(product_id=product_id, **validated_data)
+
+
 class ProductSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True)
     price = serializers.DecimalField(max_digits=10, decimal_places=2, source='unit_price')
     price_with_tax = serializers.SerializerMethodField(method_name='calculate_tax')
+    images = ProductImageSerializer(many=True, read_only=True)
     '''
     Serializing a collection models ID 
     collection = serializers.PrimaryKeyRelatedField(
@@ -66,19 +92,10 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['id','title','price','price_with_tax', 'collection', 'created_at','last_update']
+        fields = ['id','title','price','price_with_tax', 'collection','images', 'created_at','last_update']
 
 
-class ReviewSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Review
-        fields = ['id', 'rating','name','description']
 
-
-    #overide create method to add product id of page where we write the review
-    def create(self, validated_data):
-        product_id = self.context['product_id']
-        return Review.objects.create(product_id=product_id, **validated_data)
 
 
 class SimpleProductSerializer(ProductSerializer):

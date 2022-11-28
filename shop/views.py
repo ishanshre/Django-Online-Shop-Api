@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from .serializers import (
     ProductSerializer, 
+    ProductImageSerializer,
     CollectionSerializer, 
     ReviewSerializer, 
     CartSerializer, 
@@ -14,12 +15,13 @@ from .serializers import (
 )
 from .models import (
     Product, 
+    ProductImage,
     Collection, 
     Review, 
     Cart, 
     CartItem,
     Customer,
-    Order
+    Order,
 )
 # from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -178,7 +180,7 @@ class ProductDetail(generics.RetrieveUpdateDestroyAPIView):
 
 class ProductViewSet(viewsets.ModelViewSet):
     # queryset = Product.objects.all()
-    queryset = Product.objects.all()
+    queryset = Product.objects.prefetch_related("images").all()
     serializer_class = ProductSerializer
     # specifying a django filter backend 
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
@@ -208,6 +210,18 @@ class ProductViewSet(viewsets.ModelViewSet):
                 'error':'Product cannot be deleted when more than one product is associated with order items.'
             }, status=status.HTTP_405_METHOD_NOT_ALLOWED)
         return super().destroy(request, *args, **kwargs)
+
+
+class ProductImageViewSet(viewsets.ModelViewSet):
+    serializer_class = ProductImageSerializer
+
+    def get_queryset(self):
+        return ProductImage.objects.filter(product_id=self.kwargs['product_pk'])
+
+    # product_id is null at this point so we pass product id from get_serializer_context in modelview set
+    # We extract product id from the url
+    def get_serializer_context(self):
+        return {"product_id": self.kwargs["product_pk"]}
 
 '''
 class CollectionList(generics.ListCreateAPIView):
