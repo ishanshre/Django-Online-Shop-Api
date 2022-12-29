@@ -14,11 +14,12 @@ from pathlib import Path
 from datetime import timedelta
 import os
 from dotenv import load_dotenv
-load_dotenv()
+from celery.schedules import crontab
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+load_dotenv(os.path.join(BASE_DIR, ".env"))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
@@ -200,5 +201,17 @@ DJOSER = {
     'SERIALIZERS': {
         'user_create':'accounts.serializers.UserCreateSerializer',
         'current_user':'accounts.serializers.UserSerializer',
+    }
+}
+
+
+# celery config
+CELERY_BROKER_URL = 'redis://localhost:6379/1'
+CELERY_BEAT_SCHEDULE = {
+    "notify_customers": {
+        "tasks": "shop.tasks.notify_customers",
+        # crontab(day_of_week=1, hour=7, minute=30)
+        "schedule": 5,
+        "args": ["hello world"],
     }
 }

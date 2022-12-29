@@ -1,0 +1,5 @@
+running redis
+docker run -d -p 6379:6379 redis
+
+running celery
+celery -A core worker --loglevel=info     
