@@ -241,6 +241,7 @@ class CollectionDetail(generics.RetrieveUpdateDestroyAPIView):
 class CollectionViewSet(viewsets.ModelViewSet):
     queryset = Collection.objects.annotate(products_count=Count('collection_products')).all()
     serializer_class = CollectionSerializer
+    permission_classes = [IsAdminOrReadOnly]
 
     def destroy(self, request, *args, **kwargs):
         obj = self.get_object()
